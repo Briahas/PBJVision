@@ -32,7 +32,7 @@
 
 #define LOG_WRITER 0
 #if !defined(NDEBUG) && LOG_WRITER
-#   define DLog(fmt, ...) NSLog((@"writer: " fmt), ##__VA_ARGS__);
+#   define DLog(fmt, ...) dispatch_async(dispatch_get_main_queue(), ^{NSLog((@"VISION: " fmt), ##__VA_ARGS__);})
 #else
 #   define DLog(...)
 #endif

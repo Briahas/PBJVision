@@ -36,7 +36,7 @@
 #define LOG_VISION 1
 #ifndef DLog
 #if !defined(NDEBUG) && LOG_VISION
-#   define DLog(fmt, ...) NSLog((@"VISION: " fmt), ##__VA_ARGS__);
+#   define DLog(fmt, ...) dispatch_async(dispatch_get_main_queue(), ^{NSLog((@"VISION: " fmt), ##__VA_ARGS__);})
 #else
 #   define DLog(...)
 #endif
@@ -574,6 +574,11 @@ typedef NS_ENUM(GLint, PBJVisionUniformLocationTypes)
 - (void)setVideoFrameRate:(NSInteger)videoFrameRate
 {
     if (![self supportsVideoFrameRate:videoFrameRate]) {
+        [self _enqueueBlockOnMainQueue:^{
+            if ([_delegate respondsToSelector:@selector(visionDidChangeVideoFormatAndFrameRate:)])
+                [_delegate visionDidChangeVideoFormatAndFrameRate:self];
+        }];
+
         DLog(@"frame rate range not supported for current device format");
         return;
     }
